@@ -72,4 +72,4 @@ const Signin = (props) => {
 
 }
 
-export default Signin
+export default Signin;
