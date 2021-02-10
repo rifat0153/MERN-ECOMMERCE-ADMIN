@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { isUserLoggedIn } from "./actions";
 import Products from "./containers/Products";
 import Orders from "./containers/Orders";
+import Category from "./containers/Category";
 
 function App() {
   const dispatch = useDispatch();
@@ -28,6 +29,7 @@ function App() {
         <PrivateRoute exact path="/" component={Home} />
         <PrivateRoute  path="/products" component={ Products } />
         <PrivateRoute  path="/orders" component={ Orders } />
+        <PrivateRoute  path="/category" component={ Category } />
 
         <Route exact path="/signin" component={Signin} />
         <Route exact path="/signup" component={Signup} />
