@@ -1,5 +1,5 @@
 import axios from "../helpers/axios";
-import { authConstants, categoryConstants } from "./constants";
+import { categoryConstants } from "./constants";
 
 export const getAllCategory = () => {
   return async (dispatch) => {
@@ -35,10 +35,10 @@ export const addCategory = (form) => {
         dispatch({ type: categoryConstants.ADD_NEW_CATEGORY_REQUEST })
 
         const res = await axios.post(`/category/create`, form)
-        if(res.status === 201){
+        if(res.status === 201 || res.status === 200){
             dispatch({ 
                 type: categoryConstants.ADD_NEW_CATEGORY_SUCCESS,
-                payload: res.data.category
+                payload: { category: res.data.category } 
              })
         }else{
             dispatch({

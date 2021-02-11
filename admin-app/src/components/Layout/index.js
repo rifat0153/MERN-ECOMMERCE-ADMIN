@@ -3,6 +3,8 @@ import { Col, Container, Row } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import Header from "../Header";
 
+import './sidebar.css';
+
 const Layout = (props) => {
   return (
     <>

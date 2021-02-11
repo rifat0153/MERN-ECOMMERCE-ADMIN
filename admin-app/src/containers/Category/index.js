@@ -18,14 +18,13 @@ const Category = (props) => {
   const handleShow = () => setShow(true);
 
   const handleClose = () => {
-
     const form = new FormData();
 
-    form.append('name', categoryName);
-    form.append('parentId', parentCategoryId);
-    form.append('categoryImage', categoryImage);
+    form.append("name", categoryName);
+    form.append("parentId", parentCategoryId);
+    form.append("categoryImage", categoryImage);
 
-    dispatch(addCategory(form))
+    dispatch(addCategory(form));
 
     // const cat = {
     //     categoryName,
@@ -35,8 +34,7 @@ const Category = (props) => {
 
     // console.log(cat);
 
-
-    setShow(false)
+    setShow(false);
   };
 
   useEffect(() => {
