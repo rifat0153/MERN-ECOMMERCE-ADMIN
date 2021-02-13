@@ -1,15 +1,15 @@
-import { Button, Modal } from 'react-bootstrap';
-import React, { useState } from 'react'
-import { Col, Container, Row } from 'react-bootstrap';
-import Layout from '../../components/Layout'
-import Input from '../../components/UI/Input';
-import { useDispatch, useSelector } from 'react-redux';
-import { addProduct } from '../../actions';
+import React, { useState } from "react";
+import { Col, Container, Row, Table } from "react-bootstrap";
+import Layout from "../../components/Layout";
+import Input from "../../components/UI/Input";
+import { useDispatch, useSelector } from "react-redux";
+import { addProduct } from "../../actions";
+import NewModal from "../../components/UI/Modal";
 
 /**
-* @author
-* @function Products
-**/
+ * @author
+ * @function Products
+ **/
 
 const Products = (props) => {
   const [name, setName] = useState("");
@@ -21,31 +21,28 @@ const Products = (props) => {
   const [show, setShow] = useState(false);
   const dispatch = useDispatch();
 
-
-  const category = useSelector(state => state.category)
-
+  const product = useSelector((state) => state.product);
+  const category = useSelector((state) => state.category);
 
   const handleShow = () => setShow(true);
 
   const handleClose = () => {
-
     const form = new FormData();
 
-    form.append('name', name);
-    form.append('quantity', quantity);
-    form.append('price', price);
-    form.append('description', description);
-    form.append('category', categoryId);
+    form.append("name", name);
+    form.append("quantity", quantity);
+    form.append("price", price);
+    form.append("description", description);
+    form.append("category", categoryId);
 
-    for(let pic of productPictures){
-      form.append('productPicture', pic);
+    for (let pic of productPictures) {
+      form.append("productPicture", pic);
     }
 
     dispatch(addProduct(form));
 
     setShow(false);
   };
-
 
   const createCategoryList = (categories, options = []) => {
     for (let category of categories) {
@@ -59,18 +56,43 @@ const Products = (props) => {
   };
 
   const handleProductPicture = (e) => {
-    setProductPictures([
-      ...productPictures,
-      e.target.files[0]
-    ])
+    setProductPictures([...productPictures, e.target.files[0]]);
+  };
 
-    console.log(productPictures)
-  }
+  const renderProducts = () => {
+    return (
+      <Table striped bordered hover size="sm">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Description</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody>
+          {product.products.length > 0
+            ? product.products.map((product) => (
+                <tr key = {product._id}>
+                  <td>2</td>
+                  <td>{product.name}</td>
+                  <td>{product.price}</td>
+                  <td>{product.quantity}</td>
+                  <td>{product.description} </td>
+                  <td>{product.category}</td>
+                </tr>
+              ))
+            : null}
+        </tbody>
+      </Table>
+    );
+  };
 
-
-  return(
+  return (
     <Layout sidebar>
-        <Container>
+      <Container>
         <Row>
           <Col md={12}>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -79,20 +101,22 @@ const Products = (props) => {
             </div>
           </Col>
         </Row>
-        </Container>
+        <Row style={{ paddingTop: "20px" }}>
+          <Col>{renderProducts()}</Col>
+        </Row>
+      </Container>
 
-
-        <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add New Category</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Input
-            value={name}
-            placeholder={"Product Name"}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <Input
+      <NewModal
+        show={show}
+        handleClose={handleClose}
+        modalTitle={"ADD NEW PRODUCT"}
+      >
+        <Input
+          value={name}
+          placeholder={"Product Name"}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <Input
           label="Quantity"
           value={quantity}
           placeholder={`Quantity`}
@@ -111,35 +135,32 @@ const Products = (props) => {
           onChange={(e) => setDescription(e.target.value)}
         />
         <select
-            className="form-control"
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-          >
-            <option value="">Select Category</option>
-            {createCategoryList(category.categories).map((c) => (
-              <option key={c._id} value={c.value}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          className="form-control"
+          value={categoryId}
+          onChange={(e) => setCategoryId(e.target.value)}
+        >
+          <option value="">Select Category</option>
+          {createCategoryList(category.categories).map((c) => (
+            <option key={c._id} value={c.value}>
+              {c.name}
+            </option>
+          ))}
+        </select>
 
-          {
-            productPictures.length > 0 ? 
-            productPictures.map( (pic, index) => <div key={index}>{pic.name}</div> ) : null
-          }
+        {productPictures.length > 0
+          ? productPictures.map((pic, index) => (
+              <div key={index}>{pic.name}</div>
+            ))
+          : null}
 
-          <input type="file" name="productPicture" onChange={handleProductPicture} />
-
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="primary" onClick={handleClose}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        <input
+          type="file"
+          name="productPicture"
+          onChange={handleProductPicture}
+        />
+      </NewModal>
     </Layout>
-   )
-
- }
+  );
+};
 
 export default Products;

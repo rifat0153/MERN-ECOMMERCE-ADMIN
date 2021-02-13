@@ -1,79 +1,102 @@
-import { categoryConstants } from "../actions/constants"
+import { categoryConstants } from "../actions/constants";
+import Category from "../containers/Category";
 
 const initialState = {
-    categories: [],
-    loading: false,
-    error: null
-}
-
+  categories: [],
+  loading: false,
+  error: null,
+};
 
 const buildNewCategories = (pId, categories, category) => {
-    
-    let myCategories = []
-    
-    for(let cat of categories){
+  let myCategories = [];
 
-        if( cat._id == pId){
-            myCategories.push({
-                ...cat,
-                clildren: cat.clildren && cat.clildren.length > 0 ? buildNewCategories(pId, [...cat.clildren, {
+  //   IF category is a parent category....meaning it will have no parent...itslef is a parent
+  if (pId === null) {
+    return [
+      ...categories,
+      {
+        _id: category._id,
+        name: category.name,
+        slug: category.slug,
+        clildren: [],
+      },
+    ];
+  }
+
+  //if new category is a child category
+  for (let cat of categories) {
+    if (cat._id == pId) {
+      myCategories.push({
+        ...cat,
+        clildren:
+          cat.clildren && cat.clildren.length > 0
+            ? buildNewCategories(
+                pId,
+                [
+                  ...cat.clildren,
+                  {
                     _id: category._id,
                     name: category.name,
                     slug: category.slug,
                     parentId: category.parentId,
                     clildren: category.clildren,
-
-                }], category) : []
-            })
-        }else{
-            myCategories.push({
-                ...cat,
-                clildren: cat.clildren && cat.clildren.length > 0 ? buildNewCategories(pId, cat.clildren, category) : []
-            })
-        }
-
-        
+                  },
+                ],
+                category
+              )
+            : [],
+      });
+    } else {
+      myCategories.push({
+        ...cat,
+        clildren:
+          cat.clildren && cat.clildren.length > 0
+            ? buildNewCategories(pId, cat.clildren, category)
+            : [],
+      });
     }
+  }
 
-    return myCategories;
-}
+  return myCategories;
+};
 
+export default (state = initialState, action) => {
+  switch (action.type) {
+    case categoryConstants.GET_ALL_CATEGORY_SUCCESS:
+      state = {
+        ...state,
+        categories: action.payload.categories,
+      };
+      break;
+    case categoryConstants.ADD_NEW_CATEGORY_REQUEST:
+      state = {
+        ...state,
+        loading: true,
+      };
+      break;
+    case categoryConstants.ADD_NEW_CATEGORY_SUCCESS:
+      const category = action.payload.category;
+      const updatedCategories = buildNewCategories(
+        category.parentId,
+        state.categories,
+        category
+      );
+      console.log("updated categoires", updatedCategories);
 
+      state = {
+        ...state,
+        categories: updatedCategories,
+        loading: false,
+      };
+      break;
+    case categoryConstants.ADD_NEW_CATEGORY_FAILURE:
+      state = {
+        ...initialState,
+        loading: false,
+        error: action.payload.error,
+      };
+      break;
+  }
 
-
-export default ( state = initialState, action ) => {
-    switch(action.type){
-        case categoryConstants.GET_ALL_CATEGORY_SUCCESS:
-            state = {
-                ...state,
-                categories: action.payload.categories
-            }
-            break;
-            case categoryConstants.ADD_NEW_CATEGORY_REQUEST:
-                state = {
-                    ...state,
-                    loading: true
-                }
-                break;
-            case categoryConstants.ADD_NEW_CATEGORY_SUCCESS:
-                const category = action.payload.category;
-                const updatedCategories = buildNewCategories(category.parentId, state.categories, category);
-                console.log('updated categoires', updatedCategories);
-                
-                state = {
-                    ...state,
-                    categories: updatedCategories,
-                    loading: false,
-                }
-                break;
-            case categoryConstants.ADD_NEW_CATEGORY_FAILURE:
-                state = {
-                    ...initialState,
-                    loading: false,
-                    error: action.payload.error
-                }
-                break;
-    }
-
-    return state;
-}
+  return state;
+};
